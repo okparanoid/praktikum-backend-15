@@ -57,12 +57,12 @@ app.use(auth);
 app.use('/cards', cards);
 app.use('/users', users);
 
-app.use(errorLogger);
-app.use(errors());
-
 app.all('/*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
+
+app.use(errorLogger);
+app.use(errors());
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
@@ -70,7 +70,7 @@ app.use((err, req, res, next) => {
 
   if (err.name === 'ValidationError') {
     return res.status(400).send({ message: err.message });
-  } if (err.code === 11000) {
+  } if (err.name === 'MongoError' && err.code === 11000) {
     return res.status(409).send({ message: 'Введите другую почту' });
   } if (err.name === 'CastError') {
     return res.status(400).send({ message: 'Невалидный id' });
