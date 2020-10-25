@@ -10,6 +10,7 @@ const { createUser, login } = require('./controllers/users.js');
 const auth = require('./middlewares/auth.js');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { validatorURL, validatorEmail } = require('./middlewares/validator');
+const NotFoundError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 
@@ -58,6 +59,10 @@ app.use('/users', users);
 
 app.use(errorLogger);
 app.use(errors());
+
+app.all('/*', () => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
+});
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
